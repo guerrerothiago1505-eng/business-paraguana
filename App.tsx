@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import WelcomeScreen from './screens/WelcomeScreen';
 import RegistrationFlow from './screens/RegistrationFlow';
 import LoginScreen from './screens/LoginScreen';
@@ -95,25 +96,40 @@ const App: React.FC = () => {
   };
 
   const renderView = () => {
-    switch (currentView) {
-      case 'welcome': return <WelcomeScreen onStart={() => setCurrentView('register')} onLogin={() => setCurrentView('login')} />;
-      case 'register': return <RegistrationFlow onComplete={handleFinishRegistration} />;
-      case 'login': return <LoginScreen onBack={() => setCurrentView('welcome')} onLogin={handleLogin} />;
-      case 'home': return <HomeScreen onNavigate={setCurrentView} onListingClick={handleViewListing} historyIds={history} />;
-      case 'requests': return <RequestsScreen onViewDetail={(req) => { setSelectedRequest(req); setCurrentView('request-detail'); }} />;
-      case 'request-detail': return <RequestDetailScreen request={selectedRequest} onBack={() => setCurrentView('requests')} />;
-      case 'chat': return <ChatScreen />;
-      case 'profile': return <ProfileScreen user={user} onLogout={() => { localStorage.removeItem('bp_user'); setUser(null); setCurrentView('welcome'); }} onGoFavorites={() => setCurrentView('favorites')} />;
-      case 'realestate': return <RealEstateScreen onBack={() => setCurrentView('home')} onPost={() => setCurrentView('post-property')} onListingClick={handleViewListing} favorites={favorites} onToggleFavorite={toggleFavorite} />;
-      case 'listing-detail': return <ListingDetailScreen listing={selectedListing} onBack={() => setCurrentView('realestate')} isFavorite={favorites.includes(selectedListing?.id || '')} onToggleFavorite={() => toggleFavorite(selectedListing?.id || '')} onContact={() => setCurrentView('chat')} />;
-      case 'post-property': return <PostPropertyScreen onBack={() => setCurrentView('home')} />;
-      case 'post-vehicle': return <PostVehicleScreen onBack={() => setCurrentView('home')} />;
-      case 'services': return <ServicesScreen onBack={() => setCurrentView('home')} onSelectService={handleSelectService} />;
-      case 'service-form': return <ServiceFormScreen service={selectedService} onBack={() => setCurrentView('services')} />;
-      case 'business': return <BusinessToolsScreen onBack={() => setCurrentView('home')} onNavigate={setCurrentView} />;
-      case 'favorites': return <FavoritesScreen onBack={() => setCurrentView('profile')} onListingClick={handleViewListing} favoriteIds={favorites} />;
-      default: return <HomeScreen onNavigate={setCurrentView} onListingClick={handleViewListing} historyIds={history} />;
-    }
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentView}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="flex-1 flex flex-col"
+        >
+          {(() => {
+            switch (currentView) {
+              case 'welcome': return <WelcomeScreen onStart={() => setCurrentView('register')} onLogin={() => setCurrentView('login')} />;
+              case 'register': return <RegistrationFlow onComplete={handleFinishRegistration} />;
+              case 'login': return <LoginScreen onBack={() => setCurrentView('welcome')} onLogin={handleLogin} />;
+              case 'home': return <HomeScreen onNavigate={setCurrentView} onListingClick={handleViewListing} historyIds={history} />;
+              case 'requests': return <RequestsScreen onViewDetail={(req) => { setSelectedRequest(req); setCurrentView('request-detail'); }} />;
+              case 'request-detail': return <RequestDetailScreen request={selectedRequest} onBack={() => setCurrentView('requests')} />;
+              case 'chat': return <ChatScreen />;
+              case 'profile': return <ProfileScreen user={user} onLogout={() => { localStorage.removeItem('bp_user'); setUser(null); setCurrentView('welcome'); }} onGoFavorites={() => setCurrentView('favorites')} />;
+              case 'realestate': return <RealEstateScreen onBack={() => setCurrentView('home')} onPost={() => setCurrentView('post-property')} onListingClick={handleViewListing} favorites={favorites} onToggleFavorite={toggleFavorite} />;
+              case 'listing-detail': return <ListingDetailScreen listing={selectedListing} onBack={() => setCurrentView('realestate')} isFavorite={favorites.includes(selectedListing?.id || '')} onToggleFavorite={() => toggleFavorite(selectedListing?.id || '')} onContact={() => setCurrentView('chat')} />;
+              case 'post-property': return <PostPropertyScreen onBack={() => setCurrentView('home')} />;
+              case 'post-vehicle': return <PostVehicleScreen onBack={() => setCurrentView('home')} />;
+              case 'services': return <ServicesScreen onBack={() => setCurrentView('home')} onSelectService={handleSelectService} />;
+              case 'service-form': return <ServiceFormScreen service={selectedService} onBack={() => setCurrentView('services')} />;
+              case 'business': return <BusinessToolsScreen onBack={() => setCurrentView('home')} onNavigate={setCurrentView} />;
+              case 'favorites': return <FavoritesScreen onBack={() => setCurrentView('profile')} onListingClick={handleViewListing} favoriteIds={favorites} />;
+              default: return <HomeScreen onNavigate={setCurrentView} onListingClick={handleViewListing} historyIds={history} />;
+            }
+          })()}
+        </motion.div>
+      </AnimatePresence>
+    );
   };
 
   const showNavbar = ['home', 'requests', 'chat', 'profile', 'realestate', 'services', 'business', 'request-detail', 'post-property', 'post-vehicle', 'listing-detail', 'favorites', 'service-form'].includes(currentView);
